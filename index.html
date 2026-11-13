@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>年末午餐聚餐｜日期投票</title>
+<style>
+:root{--ink:#263342;--muted:#6d7885;--line:#e5e9ee;--accent:#b78b55;--soft:#f7f1e9}
+*{box-sizing:border-box}body{margin:0;background:#f4f6f8;color:var(--ink);font-family:"Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif}
+.wrap{max-width:900px;margin:auto;padding:24px 15px 48px}.hero{background:linear-gradient(130deg,#263849,#435a68);color:white;border-radius:20px;padding:30px}
+.eyebrow{font-size:12px;letter-spacing:2px;color:#e4c9a7;font-weight:700}h1{font-size:clamp(27px,5vw,39px);line-height:1.25;margin:12px 0}
+.hero p{color:#e4e9ed;line-height:1.7;margin:0}.pill{display:inline-block;margin-top:17px;border:1px solid #ffffff66;border-radius:99px;padding:7px 12px;font-size:13px}
+.card{background:white;border:1px solid var(--line);border-radius:16px;padding:22px;margin-top:16px;box-shadow:0 8px 25px #1d2b3a08}
+h2{font-size:19px;margin:0 0 6px}.sub{font-size:13px;color:var(--muted);line-height:1.6;margin:0 0 16px}
+.restaurant{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.restaurant strong{font-size:18px}.restaurant small{display:block;color:var(--muted);margin-top:6px}
+a{color:#8d6538;font-weight:700;text-decoration:none}.field{display:grid;gap:7px;margin:14px 0}label{font-size:14px;font-weight:700}
+select{width:100%;border:1px solid #d8dee5;border-radius:10px;padding:12px;font:inherit;background:white;color:var(--ink)}
+.calendar-wrap{display:grid;gap:18px}.month{border:1px solid var(--line);border-radius:13px;padding:13px}.month-title{font-weight:800;font-size:17px;margin:0 0 12px}.calendar{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}.weekday{text-align:center;font-size:12px;color:var(--muted);font-weight:800;padding:5px 0}.day{min-height:66px;border:1px solid var(--line);border-radius:9px;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;position:relative}.day .num{font-size:15px;font-weight:700}.day .hint{font-size:10px;color:var(--muted)}.day.available{cursor:pointer}.day.available:has(input:checked){border:2px solid var(--accent);background:var(--soft)}.day input{accent-color:#8d6538;width:16px;height:16px;margin:0}.day.disabled{background:#f5f6f7;color:#b8bec5;border-style:dashed}.day.empty{border:0;background:transparent;min-height:0}.calendar-legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin:10px 0 0}.legend-dot{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:5px;background:var(--soft);border:1px solid var(--accent)}.legend-disabled{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:5px;background:#f5f6f7;border:1px dashed #c9ced4}
+.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:17px}button{border:0;border-radius:9px;padding:11px 16px;font:inherit;font-weight:700;cursor:pointer}
+.primary{background:var(--accent);color:white}.primary:disabled{opacity:.55;cursor:wait}.secondary{background:#eef1f4;color:var(--ink)}
+.note{font-size:12px;color:var(--muted);line-height:1.6;margin-top:12px}
+.result-card{border:1px solid var(--line);border-radius:12px;padding:13px;margin:10px 0}.result-top{display:flex;justify-content:space-between;gap:10px;align-items:center}.result-top b{font-size:15px}.count{font-weight:800;color:#8d6538}
+.bar{height:9px;background:#edf0f2;border-radius:99px;overflow:hidden;margin:9px 0}.fill{height:100%;background:linear-gradient(90deg,#c5a276,#9d7549);border-radius:99px}
+.people{font-size:12px;color:var(--muted);line-height:1.7}.people strong{color:var(--ink)}
+.empty{background:#f7f8f9;border-radius:10px;padding:18px;text-align:center;color:var(--muted);font-size:14px}
+.status{font-size:12px;margin-top:10px;color:var(--green,#4d8068)}.error{color:#a33}.notice{background:#f8f5ef;border-left:3px solid var(--accent);padding:11px 13px;border-radius:7px;color:#665b4d;font-size:13px;line-height:1.6;margin-top:14px}
+.footer{text-align:center;color:#8b949e;font-size:12px;margin-top:22px}
+@media(max-width:650px){.wrap{padding:13px 10px 35px}.hero{padding:24px 20px}.card{padding:18px 14px}.month{padding:9px}.calendar{gap:3px}.day{min-height:55px;border-radius:7px}.day .num{font-size:14px}.day .hint{font-size:9px}}
+</style></head>
+<body><main class="wrap">
+<header class="hero"><div class="eyebrow">YEAR-END LUNCH GATHERING</div><h1>年末午餐聚餐<br>日期投票</h1>
+<p>選出大家都方便的日子，<br>一起吃頓午餐、聊聊天！</p><div class="pill">投票期間｜11/16 ～ 12/15</div></header>
+<section class="card"><div class="restaurant"><div><h2>聚餐地點</h2><strong>饗饗 INPARADISE｜新莊店</strong><small>午餐時段｜實際用餐日期依投票結果決定</small></div>
+<a href="https://inparadise.com.tw/zh-TW/news/detail/Xinzhuang" target="_blank" rel="noopener">餐廳資訊 ↗</a></div></section>
+<section class="card"><h2>選擇可以出席的日期</h2><p class="sub">請選擇姓名，再於月曆中點選所有可以參加的平日（可複選）。月曆由星期日開始，星期六結束。</p>
+<form id="form"><div class="field"><label for="name">投票姓名</label><select id="name" required><option value="">請選擇姓名</option><option>Peter</option><option>Alex</option><option>YIVEN</option><option>PAUL</option><option>KEN</option><option>YJ</option></select></div>
+<div class="calendar-wrap" id="dates"></div><div class="calendar-legend"><span><i class="legend-dot"></i>可選日期（平日）</span><span><i class="legend-disabled"></i>週末／非投票期間</span></div><div class="actions"><button class="primary" id="submitBtn" type="submit">送出／更新投票</button><button class="secondary" type="reset">清除勾選</button></div>
+<p class="note">同一個姓名再次送出，會更新先前的投票紀錄。送出後，結果會在本頁自動同步。</p><div id="message" class="status">正在連線投票資料……</div></form>
+<div class="notice">請勿代替他人投票。此投票以姓名選單識別，知道網頁網址的人都可能代選他人姓名；若需要身分驗證，需再加上公司 Google 帳號登入限制。</div></section>
+<section class="card"><h2>即時投票結果</h2><p class="sub">每 5 秒自動更新一次，亦可按下重新整理。</p><div id="results"><div class="empty">正在載入投票結果……</div></div>
+<div class="actions"><button class="secondary" id="refreshBtn" type="button">重新整理結果</button></div><div id="syncStatus" class="note">尚未取得最新資料</div></section>
+<div class="footer">年末午餐聚餐｜日期投票</div></main>
+<script>
+/* SETUP: replace this URL after deploying the Google Apps Script web app. */
+const API_URL = "PASTE_YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE";
+const people=["Peter","Alex","YIVEN","PAUL","KEN","YJ"];
+const dates=[
+ ["2026-11-16","11/16（一）"],["2026-11-17","11/17（二）"],["2026-11-18","11/18（三）"],["2026-11-19","11/19（四）"],["2026-11-20","11/20（五）"],
+ ["2026-11-23","11/23（一）"],["2026-11-24","11/24（二）"],["2026-11-25","11/25（三）"],["2026-11-26","11/26（四）"],["2026-11-27","11/27（五）"],
+ ["2026-11-30","11/30（一）"],["2026-12-01","12/01（二）"],["2026-12-02","12/02（三）"],["2026-12-03","12/03（四）"],["2026-12-04","12/04（五）"],
+ ["2026-12-07","12/07（一）"],["2026-12-08","12/08（二）"],["2026-12-09","12/09（三）"],["2026-12-10","12/10（四）"],["2026-12-11","12/11（五）"],
+ ["2026-12-14","12/14（一）"],["2026-12-15","12/15（二）"]
+];
+const options=document.getElementById("dates");
+const dateSet=new Set(dates.map(x=>x[0]));
+const weekdays=["日","一","二","三","四","五","六"];
+function buildMonth(year,month){
+ const section=document.createElement("section");section.className="month";
+ const title=document.createElement("h3");title.className="month-title";title.textContent=`${year} 年 ${month+1} 月`;section.appendChild(title);
+ const grid=document.createElement("div");grid.className="calendar";
+ weekdays.forEach(w=>{const el=document.createElement("div");el.className="weekday";el.textContent=w;grid.appendChild(el)});
+ const first=new Date(year,month,1).getDay();
+ const total=new Date(year,month+1,0).getDate();
+ for(let i=0;i<first;i++){const blank=document.createElement("div");blank.className="day empty";grid.appendChild(blank)}
+ for(let day=1;day<=total;day++){
+  const d=new Date(year,month,day);const key=`${year}-${String(month+1).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
+  const isWeekday=d.getDay()!==0&&d.getDay()!==6;const selectable=dateSet.has(key);
+  const cell=document.createElement(selectable?"label":"div");cell.className="day "+(selectable?"available":"disabled");
+  if(selectable){cell.innerHTML=`<input type="checkbox" name="day" value="${key}" aria-label="${key}"><span class="num">${day}</span><span class="hint">可投票</span>`}
+  else{cell.innerHTML=`<span class="num">${day}</span><span class="hint">${isWeekday?"非投票期間":"週末"}</span>`}
+  grid.appendChild(cell);
+ }
+ // Complete the final week so every month is a full Sunday-to-Saturday grid.
+ while(grid.children.length % 7 !== 0){
+  const blank=document.createElement("div");blank.className="day empty";grid.appendChild(blank);
+ }
+ section.appendChild(grid);return section;
+}
+// Show two separate monthly calendars, each aligned Sunday through Saturday.
+function buildMonthRange(year, month, firstDay, lastDay){
+ const section=document.createElement("section");section.className="month";
+ const title=document.createElement("h3");title.className="month-title";title.textContent=`${year} 年 ${month+1} 月`;section.appendChild(title);
+ const grid=document.createElement("div");grid.className="calendar";
+ weekdays.forEach(w=>{const el=document.createElement("div");el.className="weekday";el.textContent=w;grid.appendChild(el)});
+ const firstWeekday=new Date(year,month,firstDay).getDay();
+ for(let i=0;i<firstWeekday;i++){const blank=document.createElement("div");blank.className="day empty";grid.appendChild(blank)}
+ for(let day=firstDay;day<=lastDay;day++){
+  const d=new Date(year,month,day);
+  const key=`${year}-${String(month+1).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
+  const selectable=dateSet.has(key);const isWeekend=d.getDay()===0||d.getDay()===6;
+  const cell=document.createElement(selectable?"label":"div");cell.className="day "+(selectable?"available":"disabled");
+  if(selectable){cell.innerHTML=`<input type="checkbox" name="day" value="${key}" aria-label="${key}"><span class="num">${day}</span><span class="hint">可投票</span>`}
+  else{cell.innerHTML=`<span class="num">${day}</span><span class="hint">${isWeekend?"週末":"非投票日"}</span>`}
+  grid.appendChild(cell);
+ }
+ while(grid.children.length % 7 !== 0){const blank=document.createElement("div");blank.className="day empty";grid.appendChild(blank)}
+ section.appendChild(grid);return section;
+}
+options.appendChild(buildMonthRange(2026,10,15,30));
+options.appendChild(buildMonthRange(2026,11,1,15));
+function setMessage(t,isError=false){const m=document.getElementById("message");m.textContent=t;m.className=isError?"status error":"status"}
+function loadResults(){
+ if(API_URL.startsWith("PASTE_")){document.getElementById("results").innerHTML='<div class="empty">尚未設定 Google Apps Script 網址。請先完成安裝步驟。</div>';setMessage("尚未設定後端網址",true);return}
+ const callback="pollCallback_"+Date.now()+"_"+Math.floor(Math.random()*100000);
+ const script=document.createElement("script");
+ const timeout=setTimeout(()=>{cleanup();document.getElementById("syncStatus").textContent="更新逾時，請稍後重試";},10000);
+ function cleanup(){clearTimeout(timeout);delete window[callback];script.remove()}
+ window[callback]=(data)=>{cleanup();if(!data||!data.ok){document.getElementById("syncStatus").textContent="讀取資料失敗";return}render(data.votes||{});document.getElementById("syncStatus").textContent="最後同步："+new Date().toLocaleTimeString("zh-TW");};
+ script.onerror=()=>{cleanup();document.getElementById("syncStatus").textContent="無法連線，請確認 Apps Script 部署網址與權限";};
+ script.src=API_URL+"?action=results&callback="+callback+"&_="+Date.now();document.body.appendChild(script);
+}
+function render(votes){
+ const counts=Object.fromEntries(dates.map(x=>[x[0],0]));
+ Object.values(votes).forEach(a=>a.forEach(d=>{if(counts[d]!==undefined)counts[d]++}));
+ const sorted=dates.slice().sort((a,b)=>counts[b[0]]-counts[a[0]]||a[0].localeCompare(b[0]));
+ document.getElementById("results").innerHTML=sorted.map(([d,l])=>{const names=people.filter(p=>(votes[p]||[]).includes(d));return `<div class="result-card"><div class="result-top"><b>${l}</b><span class="count">${counts[d]} / 6 人</span></div><div class="bar"><div class="fill" style="width:${counts[d]/6*100}%"></div></div><div class="people">${names.length?`可出席：<strong>${names.join("、")}</strong>`:"尚無人投票"}</div></div>`}).join("");
+ const current=document.getElementById("name").value;if(current){document.querySelectorAll('input[name="day"]').forEach(x=>x.checked=(votes[current]||[]).includes(x.value))}
+}
+document.getElementById("name").addEventListener("change",()=>{document.querySelectorAll('input[name="day"]').forEach(x=>x.checked=false);loadResults()});
+document.getElementById("form").addEventListener("submit",async e=>{
+ e.preventDefault();const p=document.getElementById("name").value;const selected=[...document.querySelectorAll('input[name="day"]:checked')].map(x=>x.value);
+ if(!p){setMessage("請選擇姓名",true);return}if(!selected.length){setMessage("請至少勾選一個日期",true);return}
+ if(API_URL.startsWith("PASTE_")){setMessage("請先設定 Google Apps Script 網址",true);return}
+ const btn=document.getElementById("submitBtn");btn.disabled=true;setMessage("正在送出投票……");
+ try{
+  await fetch(API_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8"},body:new URLSearchParams({name:p,dates:selected.join(","),action:"vote"})});
+  setMessage("已送出，正在確認雲端資料……");setTimeout(loadResults,1200);setTimeout(loadResults,3000);
+ }catch(err){setMessage("送出失敗，請稍後再試。",true)}
+ finally{setTimeout(()=>btn.disabled=false,1500)}
+});
+document.getElementById("refreshBtn").addEventListener("click",loadResults);
+loadResults();setInterval(loadResults,5000);
+</script></body></html>
