@@ -23,7 +23,7 @@ select{width:100%;border:1px solid #d8dee5;border-radius:10px;padding:12px;font:
 .bar{height:9px;background:#edf0f2;border-radius:99px;overflow:hidden;margin:9px 0}.fill{height:100%;background:linear-gradient(90deg,#c5a276,#9d7549);border-radius:99px}
 .people{font-size:12px;color:var(--muted);line-height:1.7}.people strong{color:var(--ink)}
 .empty{background:#f7f8f9;border-radius:10px;padding:18px;text-align:center;color:var(--muted);font-size:14px}
-.status{font-size:12px;margin-top:10px;color:var(--green,#4d8068)}.error{color:#a33}.notice{background:#f8f5ef;border-left:3px solid var(--accent);padding:11px 13px;border-radius:7px;color:#665b4d;font-size:13px;line-height:1.6;margin-top:14px}
+.status{font-size:12px;margin-top:10px;color:var(--green,#4d8068)}.status.editing{color:#94652f;font-weight:700}.error{color:#a33}.notice{background:#f8f5ef;border-left:3px solid var(--accent);padding:11px 13px;border-radius:7px;color:#665b4d;font-size:13px;line-height:1.6;margin-top:14px}
 .footer{text-align:center;color:#8b949e;font-size:12px;margin-top:22px}
 @media(max-width:650px){.wrap{padding:13px 10px 35px}.hero{padding:24px 20px}.card{padding:18px 14px}.month{padding:9px}.calendar{gap:3px}.day{min-height:55px;border-radius:7px}.day .num{font-size:14px}.day .hint{font-size:9px}}
 </style></head>
@@ -34,7 +34,7 @@ select{width:100%;border:1px solid #d8dee5;border-radius:10px;padding:12px;font:
 <a href="https://inparadise.com.tw/zh-TW/news/detail/Xinzhuang" target="_blank" rel="noopener">餐廳資訊 ↗</a></div></section>
 <section class="card"><h2>選擇可以出席的日期</h2><p class="sub">請選擇姓名，再於月曆中點選所有可以參加的平日（可複選）。月曆由星期日開始，星期六結束。</p>
 <form id="form"><div class="field"><label for="name">投票姓名</label><select id="name" required><option value="">請選擇姓名</option><option>Peter</option><option>Alex</option><option>YIVEN</option><option>PAUL</option><option>KEN</option><option>YJ</option></select></div>
-<div class="calendar-wrap" id="dates"></div><div class="calendar-legend"><span><i class="legend-dot"></i>可選日期（平日）</span><span><i class="legend-disabled"></i>週末／非投票期間</span></div><div class="actions"><button class="primary" id="submitBtn" type="submit">送出／更新投票</button><button class="secondary" type="reset">清除勾選</button></div>
+<div class="calendar-wrap" id="dates"></div><div class="calendar-legend"><span><i class="legend-dot"></i>可選日期（平日）</span><span><i class="legend-disabled"></i>週末／非投票期間</span></div><div class="actions"><button class="primary" id="submitBtn" type="submit">送出／更新投票</button><button class="secondary" id="clearBtn" type="button">清除勾選</button></div>
 <p class="note">同一個姓名再次送出，會更新先前的投票紀錄。送出後，結果會在本頁自動同步。</p><div id="message" class="status">正在連線投票資料……</div></form>
 <div class="notice">請勿代替他人投票。此投票以姓名選單識別，知道網頁網址的人都可能代選他人姓名；若需要身分驗證，需再加上公司 Google 帳號登入限制。</div></section>
 <section class="card"><h2>即時投票結果</h2><p class="sub">每 5 秒自動更新一次，亦可按下重新整理。</p><div id="results"><div class="empty">正在載入投票結果……</div></div>
@@ -42,8 +42,8 @@ select{width:100%;border:1px solid #d8dee5;border-radius:10px;padding:12px;font:
 <div class="footer">年末午餐聚餐｜日期投票</div></main>
 <script>
 /* SETUP: replace this URL after deploying the Google Apps Script web app. */
-const API_URL = "https://script.google.com/macros/s/AKfycby9tLG_pcWi5Gd4hFBwjhiVYQfuN0ErwcDnklFVVN-MvQ1At-Ppgs4uexKRXj8npBjJ/exec";
-const people=["Peter","Alex","Yiven","Paul","Ken","YJ"];
+const API_URL = "https://script.google.com/macros/s/AKfycby9tLG_pcWi5Gd4hFBwjhiVYQfuN0ErwcDnkIFVVN-MvQ1At-Ppgs4uexKRXj8npBjJ/exec";
+const people=["Peter","Alex","YIVEN","PAUL","KEN","YJ"];
 const dates=[
  ["2026-11-16","11/16（一）"],["2026-11-17","11/17（二）"],["2026-11-18","11/18（三）"],["2026-11-19","11/19（四）"],["2026-11-20","11/20（五）"],
  ["2026-11-23","11/23（一）"],["2026-11-24","11/24（二）"],["2026-11-25","11/25（三）"],["2026-11-26","11/26（四）"],["2026-11-27","11/27（五）"],
@@ -98,36 +98,105 @@ function buildMonthRange(year, month, firstDay, lastDay){
 }
 options.appendChild(buildMonthRange(2026,10,15,30));
 options.appendChild(buildMonthRange(2026,11,1,15));
-function setMessage(t,isError=false){const m=document.getElementById("message");m.textContent=t;m.className=isError?"status error":"status"}
-function loadResults(){
- if(API_URL.startsWith("PASTE_")){document.getElementById("results").innerHTML='<div class="empty">尚未設定 Google Apps Script 網址。請先完成安裝步驟。</div>';setMessage("尚未設定後端網址",true);return}
+let isEditing = false;
+let isSubmitting = false;
+let lastSelectedName = "";
+
+function setMessage(t,isError=false,isEditingMessage=false){
+ const m=document.getElementById("message");
+ m.textContent=t;
+ m.className=isError?"status error":(isEditingMessage?"status editing":"status");
+}
+function setCheckboxesDisabled(disabled){
+ document.querySelectorAll('input[name="day"]').forEach(x=>x.disabled=disabled);
+}
+function loadResults(force=false){
+ // Never let background refresh overwrite dates while someone is editing.
+ if((isEditing || isSubmitting) && !force) return;
+ if(API_URL.startsWith("PASTE_")){
+  document.getElementById("results").innerHTML='<div class="empty">尚未設定 Google Apps Script 網址。請先完成安裝步驟。</div>';
+  setMessage("尚未設定後端網址",true);return;
+ }
  const callback="pollCallback_"+Date.now()+"_"+Math.floor(Math.random()*100000);
  const script=document.createElement("script");
  const timeout=setTimeout(()=>{cleanup();document.getElementById("syncStatus").textContent="更新逾時，請稍後重試";},10000);
  function cleanup(){clearTimeout(timeout);delete window[callback];script.remove()}
- window[callback]=(data)=>{cleanup();if(!data||!data.ok){document.getElementById("syncStatus").textContent="讀取資料失敗";return}render(data.votes||{});document.getElementById("syncStatus").textContent="最後同步："+new Date().toLocaleTimeString("zh-TW");};
+ window[callback]=(data)=>{
+  cleanup();
+  if(!data||!data.ok){document.getElementById("syncStatus").textContent="讀取資料失敗";return}
+  render(data.votes||{});
+  document.getElementById("syncStatus").textContent="最後同步："+new Date().toLocaleTimeString("zh-TW");
+  if(!isEditing && !isSubmitting) setMessage("投票資料已同步");
+ };
  script.onerror=()=>{cleanup();document.getElementById("syncStatus").textContent="無法連線，請確認 Apps Script 部署網址與權限";};
- script.src=API_URL+"?action=results&callback="+callback+"&_="+Date.now();document.body.appendChild(script);
+ script.src=API_URL+"?action=results&callback="+callback+"&_="+Date.now();
+ document.body.appendChild(script);
 }
 function render(votes){
  const counts=Object.fromEntries(dates.map(x=>[x[0],0]));
  Object.values(votes).forEach(a=>a.forEach(d=>{if(counts[d]!==undefined)counts[d]++}));
  const sorted=dates.slice().sort((a,b)=>counts[b[0]]-counts[a[0]]||a[0].localeCompare(b[0]));
- document.getElementById("results").innerHTML=sorted.map(([d,l])=>{const names=people.filter(p=>(votes[p]||[]).includes(d));return `<div class="result-card"><div class="result-top"><b>${l}</b><span class="count">${counts[d]} / 6 人</span></div><div class="bar"><div class="fill" style="width:${counts[d]/6*100}%"></div></div><div class="people">${names.length?`可出席：<strong>${names.join("、")}</strong>`:"尚無人投票"}</div></div>`}).join("");
- const current=document.getElementById("name").value;if(current){document.querySelectorAll('input[name="day"]').forEach(x=>x.checked=(votes[current]||[]).includes(x.value))}
+ document.getElementById("results").innerHTML=sorted.map(([d,l])=>{
+  const names=people.filter(p=>(votes[p]||[]).includes(d));
+  return `<div class="result-card"><div class="result-top"><b>${l}</b><span class="count">${counts[d]} / 6 人</span></div><div class="bar"><div class="fill" style="width:${counts[d]/6*100}%"></div></div><div class="people">${names.length?`可出席：<strong>${names.join("、")}</strong>`:"尚無人投票"}</div></div>`;
+ }).join("");
+ const current=document.getElementById("name").value;
+ if(current && !isEditing && !isSubmitting){
+  document.querySelectorAll('input[name="day"]').forEach(x=>x.checked=(votes[current]||[]).includes(x.value));
+ }
 }
-document.getElementById("name").addEventListener("change",()=>{document.querySelectorAll('input[name="day"]').forEach(x=>x.checked=false);loadResults()});
+document.getElementById("name").addEventListener("change",()=>{
+ const nameSelect=document.getElementById("name");
+ if(isEditing && !confirm("目前勾選的日期尚未送出。切換姓名會放棄這次修改，確定要切換嗎？")){
+  nameSelect.value=lastSelectedName;
+  return;
+ }
+ isEditing=false;
+ lastSelectedName=nameSelect.value;
+ document.querySelectorAll('input[name="day"]').forEach(x=>x.checked=false);
+ setMessage("正在載入此姓名上次的投票紀錄……");
+ loadResults(true);
+});
+options.addEventListener("change",e=>{
+ if(e.target && e.target.matches('input[name="day"]')){
+  isEditing=true;
+  setMessage("你正在編輯投票，已暫停自動同步；送出後會恢復。",false,true);
+ }
+});
+document.getElementById("clearBtn").addEventListener("click",()=>{
+ document.querySelectorAll('input[name="day"]').forEach(x=>x.checked=false);
+ isEditing=true;
+ setMessage("已清除目前勾選；自動同步暫停，送出後才會更新雲端紀錄。",false,true);
+});
 document.getElementById("form").addEventListener("submit",async e=>{
- e.preventDefault();const p=document.getElementById("name").value;const selected=[...document.querySelectorAll('input[name="day"]:checked')].map(x=>x.value);
- if(!p){setMessage("請選擇姓名",true);return}if(!selected.length){setMessage("請至少勾選一個日期",true);return}
+ e.preventDefault();
+ const p=document.getElementById("name").value;
+ const selected=[...document.querySelectorAll('input[name="day"]:checked')].map(x=>x.value);
+ if(!p){setMessage("請選擇姓名",true);return}
+ if(!selected.length){setMessage("請至少勾選一個日期",true);return}
  if(API_URL.startsWith("PASTE_")){setMessage("請先設定 Google Apps Script 網址",true);return}
- const btn=document.getElementById("submitBtn");btn.disabled=true;setMessage("正在送出投票……");
+ const btn=document.getElementById("submitBtn");
+ btn.disabled=true;isSubmitting=true;isEditing=false;setCheckboxesDisabled(true);
+ setMessage("正在送出投票……");
  try{
   await fetch(API_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8"},body:new URLSearchParams({name:p,dates:selected.join(","),action:"vote"})});
-  setMessage("已送出，正在確認雲端資料……");setTimeout(loadResults,1200);setTimeout(loadResults,3000);
- }catch(err){setMessage("送出失敗，請稍後再試。",true)}
- finally{setTimeout(()=>btn.disabled=false,1500)}
+  setMessage("已送出，正在等待雲端資料更新……");
+  // Apps Script POST uses no-cors; wait briefly, then fetch the authoritative saved result.
+  setTimeout(()=>{
+   isSubmitting=false;setCheckboxesDisabled(false);loadResults(true);
+   btn.disabled=false;
+  },2500);
+ }catch(err){
+  isSubmitting=false;setCheckboxesDisabled(false);btn.disabled=false;
+  isEditing=true;
+  setMessage("送出時發生連線錯誤，請檢查網路後再試。",true);
+ }
 });
-document.getElementById("refreshBtn").addEventListener("click",loadResults);
-loadResults();setInterval(loadResults,5000);
+document.getElementById("refreshBtn").addEventListener("click",()=>{
+ if(isEditing && !confirm("目前有尚未送出的勾選。重新整理結果會放棄這些修改，確定繼續嗎？")) return;
+ isEditing=false;loadResults(true);
+});
+lastSelectedName=document.getElementById("name").value;
+loadResults();
+setInterval(()=>loadResults(),5000);
 </script></body></html>
